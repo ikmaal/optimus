@@ -9,12 +9,13 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "start:render": "npx prisma migrate deploy && npm start",
+    "start:render": "node ./scripts/render-start.mjs",
     "lint": "eslint",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
+    "db:up": "docker compose up -d db",
     "digest:trigger": "node ./scripts/trigger-digest.mjs"
   },
   "prisma": {

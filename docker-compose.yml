@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: optimus
+      POSTGRES_PASSWORD: optimus
+      POSTGRES_DB: optimus
+    ports:
+      - "5432:5432"
+    volumes:
+      - optimus_pg:/var/lib/postgresql/data
+
+volumes:
+  optimus_pg:

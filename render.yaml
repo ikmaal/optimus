@@ -1,17 +1,21 @@
-# Render Blueprint — https://render.com/docs/blueprint-spec
+# Render Blueprint — Postgres (free tier) + Next.js web service (free tier)
+# https://render.com/docs/blueprint-spec
 #
-# Deploy: Dashboard → Blueprints → New Blueprint → connect ikmaal/optimus
-# Or: link this repo to an existing Web Service and use these settings.
-#
-# SQLite needs a persistent disk (Starter plan+). Disks are NOT mounted during
-# build — do not run `prisma migrate deploy` in buildCommand.
+# Deploy: Render → Blueprints → New Blueprint → connect your GitHub repo
+
+databases:
+  - name: optimus-db
+    plan: free
+    region: singapore
+    databaseName: optimus
+    user: optimus
 
 services:
   - type: web
     name: optimus
     runtime: node
     region: singapore
-    plan: starter
+    plan: free
     branch: main
     buildCommand: npm install && npm run build
     startCommand: npm run start:render
@@ -21,7 +25,9 @@ services:
       - key: NODE_VERSION
         value: "20"
       - key: DATABASE_URL
-        value: file:/var/data/optimus.db
+        fromDatabase:
+          name: optimus-db
+          property: connectionString
       - key: CRON_SECRET
         generateValue: true
       - key: SLACK_WEBHOOK_URL
@@ -30,7 +36,3 @@ services:
         sync: false
       - key: SLACK_CHANNEL_ID
         sync: false
-    disk:
-      name: optimus-data
-      mountPath: /var/data
-      sizeGB: 1

@@ -7,33 +7,39 @@ Product rules live in [docs/SPEC.md](docs/SPEC.md). Pilot checklist: [docs/PILOT
 ## Stack
 
 - Next.js (App Router), TypeScript, Tailwind
-- SQLite + Prisma (local single-file DB)
+- PostgreSQL + Prisma
 - Calendar: [FullCalendar](https://fullcalendar.io/) (React)
 
 Access is **open** (no sign-in): bookings store **name**, **vehicle**, and **reason**.
 
-The database file lives at **`prisma/dev.db`** when `DATABASE_URL` is `file:./dev.db` (see [.env.example](.env.example)).
-
 ## Project layout
 
 - `src/app/` — App Router pages and `api/` handlers
-- `src/components/` — client UI (dashboard, calendar)
-- `src/lib/` — Prisma client, booking helpers, calendar theming, Slack digest under `lib/slack/`
-- `src/types/` — shared types (e.g. fleet car shape for UI + API)
-- `prisma/` — schema, migrations, local DB file (ignored by git), seed script
-- `scripts/` — CLI helpers (digest trigger)
+- `src/components/` — client UI (dashboard, calendar, fleet)
+- `src/lib/` — Prisma client, booking helpers, fleet helpers, Slack digest
+- `src/types/` — shared types
+- `prisma/` — schema, migrations, seed script
+- `scripts/` — CLI helpers (Render start, digest trigger)
+- `docker-compose.yml` — local Postgres for development
 
 ## Setup
 
 1. Copy [.env.example](.env.example) to `.env`.
-2. Install and migrate:
+2. Start local Postgres:
+
+```bash
+npm run db:up
+```
+
+3. Install and migrate:
 
 ```bash
 npm install
 npx prisma migrate dev
+npx prisma db seed
 ```
 
-3. Development:
+4. Development:
 
 ```bash
 npm run dev
@@ -47,7 +53,7 @@ If creating a booking fails, run **`npx prisma migrate deploy`**, then **`npx pr
 
 | Variable | Purpose |
 |----------|---------|
-| `DATABASE_URL` | SQLite URL, typically `file:./dev.db` (relative to `prisma/`) |
+| `DATABASE_URL` | PostgreSQL URL (`postgresql://user:pass@host:5432/db?schema=public`) |
 | `SLACK_WEBHOOK_URL` | **Recommended** — Incoming Webhook URL (`https://hooks.slack.com/services/...`) for the channel where you want the daily digest |
 | `SLACK_BOT_TOKEN` | Optional — only if you use the bot instead of a webhook |
 | `SLACK_CHANNEL_ID` | Required with bot token (e.g. `C...`) |
@@ -85,17 +91,24 @@ See [.github/workflows/daily-digest.yml](.github/workflows/daily-digest.yml). Ad
 - `APP_BASE_URL` — public origin of the deployed app, no trailing slash (e.g. `https://cars.example.com`)
 - `CRON_SECRET` — same value as in the app’s environment
 
-Host the app wherever you deploy Node apps; provision SQLite on disk (or switch to Postgres later if you outgrow SQLite).
+Host the app on any Node host; [`render.yaml`](render.yaml) targets **Render free tier** (web + Postgres).
 
-### Render
+### Render (free tier)
 
-[`render.yaml`](render.yaml) defines a **Starter** web service with a **1 GB persistent disk** (SQLite at `file:/var/data/optimus.db`).
+[`render.yaml`](render.yaml) provisions:
 
-1. Push to GitHub, then **Render → Blueprints → New Blueprint** and select this repo.
-2. Set optional env vars when prompted (`SLACK_WEBHOOK_URL`, etc.). `CRON_SECRET` is auto-generated.
-3. **Build command** must be `npm install && npm run build` only — migrations run at **start** via `npm run start:render` (disks are not available during build).
+- **Free Postgres** (`optimus-db`) — bookings persist across deploys
+- **Free web service** — `DATABASE_URL` wired automatically from the database
 
-If you already created a Web Service manually, update its **Build** / **Start** commands to match `render.yaml` and attach a disk at `/var/data`.
+1. Push to GitHub.
+2. **Render → Blueprints → New Blueprint** → select this repo (or sync an existing Blueprint).
+3. Set optional env vars when prompted (`SLACK_WEBHOOK_URL`, etc.). `CRON_SECRET` is auto-generated.
+4. **Remove any old persistent disk** and delete manual `DATABASE_URL` overrides (Blueprint sets the Postgres URL).
+5. **Build:** `npm install && npm run build` · **Start:** `npm run start:render`
+
+If you created services manually before, delete the old SQLite disk config and link the web service to the Render Postgres **Internal Database URL** (or redeploy from Blueprint).
+
+**Note:** Free web services sleep when idle; free Postgres expires after 90 days of inactivity (Render policy — check current docs).
 
 ## Scripts
 
@@ -105,4 +118,5 @@ If you already created a Web Service manually, update its **Build** / **Start** 
 | `npm run build` | `prisma generate` + production build |
 | `npm run start:render` | Migrate DB then `next start` (Render production) |
 | `npm run db:migrate` | Prisma migrate (dev) |
+| `npm run db:up` | Start local Postgres (`docker compose up -d db`) |
 | `npm run db:seed` | Seed cars if table is empty |
