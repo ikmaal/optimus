@@ -1,0 +1,36 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Deploy: Dashboard → Blueprints → New Blueprint → connect ikmaal/optimus
+# Or: link this repo to an existing Web Service and use these settings.
+#
+# SQLite needs a persistent disk (Starter plan+). Disks are NOT mounted during
+# build — do not run `prisma migrate deploy` in buildCommand.
+
+services:
+  - type: web
+    name: optimus
+    runtime: node
+    region: singapore
+    plan: starter
+    branch: main
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:render
+    initialDeployHook: npx prisma db seed
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        value: file:/var/data/optimus.db
+      - key: CRON_SECRET
+        generateValue: true
+      - key: SLACK_WEBHOOK_URL
+        sync: false
+      - key: SLACK_BOT_TOKEN
+        sync: false
+      - key: SLACK_CHANNEL_ID
+        sync: false
+    disk:
+      name: optimus-data
+      mountPath: /var/data
+      sizeGB: 1

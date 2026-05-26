@@ -87,11 +87,22 @@ See [.github/workflows/daily-digest.yml](.github/workflows/daily-digest.yml). Ad
 
 Host the app wherever you deploy Node apps; provision SQLite on disk (or switch to Postgres later if you outgrow SQLite).
 
+### Render
+
+[`render.yaml`](render.yaml) defines a **Starter** web service with a **1 GB persistent disk** (SQLite at `file:/var/data/optimus.db`).
+
+1. Push to GitHub, then **Render → Blueprints → New Blueprint** and select this repo.
+2. Set optional env vars when prompted (`SLACK_WEBHOOK_URL`, etc.). `CRON_SECRET` is auto-generated.
+3. **Build command** must be `npm install && npm run build` only — migrations run at **start** via `npm run start:render` (disks are not available during build).
+
+If you already created a Web Service manually, update its **Build** / **Start** commands to match `render.yaml` and attach a disk at `/var/data`.
+
 ## Scripts
 
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Dev server |
 | `npm run build` | `prisma generate` + production build |
+| `npm run start:render` | Migrate DB then `next start` (Render production) |
 | `npm run db:migrate` | Prisma migrate (dev) |
 | `npm run db:seed` | Seed cars if table is empty |
