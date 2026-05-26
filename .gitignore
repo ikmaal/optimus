@@ -30,12 +30,22 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env — never commit secrets; example template is tracked
 .env*
+!.env.example
+
+# turbopack / tsc caches
+*.tsbuildinfo
 
 # vercel
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# prisma sqlite (local)
+/dev.db
+*.db
+*.db-journal
+
+# optional local 3D source assets (not served by Next.js)
+/assets/source/
+*.blend
+

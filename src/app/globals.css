@@ -1,26 +1,205 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --surface-page: #f4f5f7;
+  --surface-elevated: #ffffff;
+  --surface-muted: #eceef2;
+  --surface-input: #fafbfc;
+  --border-subtle: #e2e5eb;
+  --border-focus: #c5cad4;
+  --text-primary: #111318;
+  --text-secondary: #5c616e;
+  --text-muted: #8a8f9a;
+  --accent: #2d4368;
+  --accent-muted: #3d5a80;
+  --accent-hover: #243556;
+  --danger: #b42318;
+  --danger-hover: #912018;
+  --ring-focus: rgba(45, 67, 104, 0.22);
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 16px rgba(15, 23, 42, 0.06);
+  --shadow-calendar: 0 1px 2px rgba(15, 23, 42, 0.05), 0 8px 32px rgba(15, 23, 42, 0.07);
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --radius-sm: 8px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --surface-page: #0c0d10;
+    --surface-elevated: #14151a;
+    --surface-muted: #1a1c22;
+    --surface-input: #12141a;
+    --border-subtle: #2a2d36;
+    --border-focus: #3d4150;
+    --text-primary: #f1f2f4;
+    --text-secondary: #a8adb8;
+    --text-muted: #6e7380;
+    --accent: #4d6f9c;
+    --accent-muted: #6a88b0;
+    --accent-hover: #5c7eb0;
+    --danger: #f47171;
+    --danger-hover: #ff9494;
+    --ring-focus: rgba(139, 164, 199, 0.28);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35), 0 4px 24px rgba(0, 0, 0, 0.25);
+    --shadow-calendar: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 40px rgba(0, 0, 0, 0.35);
   }
 }
 
+@theme inline {
+  --color-background: var(--surface-page);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* —— FullCalendar: minimal professional shell —— */
+.optimus-calendar {
+  --fc-border-color: var(--border-subtle);
+  --fc-page-bg-color: var(--surface-elevated);
+  --fc-neutral-bg-color: var(--surface-muted);
+  --fc-today-bg-color: color-mix(in srgb, var(--accent) 7%, var(--surface-elevated));
+  --fc-highlight-color: color-mix(in srgb, var(--accent) 14%, transparent);
+  --fc-now-indicator-color: var(--accent-muted);
+  --fc-button-text-color: var(--text-secondary);
+  --fc-button-bg-color: var(--surface-muted);
+  --fc-button-border-color: var(--border-subtle);
+  --fc-button-hover-bg-color: color-mix(in srgb, var(--surface-muted) 70%, var(--border-subtle));
+  --fc-button-active-bg-color: color-mix(in srgb, var(--accent) 12%, var(--surface-elevated));
+  --fc-list-event-hover-bg-color: var(--surface-muted);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  padding: 0.5rem 0.25rem 0.75rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .optimus-calendar {
+    --fc-today-bg-color: color-mix(in srgb, var(--accent) 12%, var(--surface-elevated));
+  }
+}
+
+.optimus-calendar .fc {
+  --fc-small-font-size: 0.75rem;
+}
+
+.optimus-calendar .fc-scrollgrid,
+.optimus-calendar .fc-timegrid-axis,
+.optimus-calendar .fc-timegrid-slot-label,
+.optimus-calendar .fc-col-header-cell {
+  border-color: var(--border-subtle) !important;
+}
+
+.optimus-calendar .fc-col-header-cell {
+  padding: 0.65rem 0.35rem;
+  font-weight: 600;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--surface-elevated) !important;
+}
+
+.optimus-calendar .fc-timegrid-slot-label {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.optimus-calendar .fc-timegrid-slot {
+  height: 2.25rem;
+}
+
+.optimus-calendar .fc-timegrid-slot-minor {
+  border-color: transparent;
+}
+
+.optimus-calendar .fc-daygrid-day-frame {
+  min-height: 5rem;
+}
+
+.optimus-calendar .fc-toolbar-title {
+  font-size: 1.0625rem !important;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.optimus-calendar .fc-button {
+  font-weight: 500 !important;
+  font-size: 0.75rem !important;
+  padding: 0.4rem 0.75rem !important;
+  border-radius: var(--radius-sm) !important;
+  text-transform: none !important;
+  letter-spacing: 0.01em;
+  box-shadow: none !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.optimus-calendar .fc-button-primary:not(:disabled):active,
+.optimus-calendar .fc-button-primary:not(:disabled).fc-button-active {
+  background-color: color-mix(in srgb, var(--accent) 18%, var(--surface-elevated)) !important;
+  border-color: var(--border-focus) !important;
+  color: var(--text-primary) !important;
+}
+
+.optimus-calendar .fc-toolbar-chunk {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.optimus-calendar .fc-event {
+  border-radius: 6px !important;
+  border-width: 0 !important;
+  border-left-width: 3px !important;
+  border-left-style: solid !important;
+  padding: 3px 8px 3px 6px !important;
+  margin: 1px 2px 0 !important;
+  font-weight: 500;
+  font-size: 0.75rem !important;
+  line-height: 1.35 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  .optimus-calendar .fc-event {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  }
+}
+
+.optimus-calendar .fc-timegrid-event-harness-inset .fc-timegrid-event {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.optimus-calendar .fc-timegrid-now-indicator-line {
+  border-width: 2px 0 0;
+  opacity: 0.85;
+}
+
+.optimus-calendar .fc-timegrid-now-indicator-arrow {
+  display: none;
+}
+
+.optimus-calendar .fc-scroller {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-subtle) transparent;
+}
+
+.optimus-calendar .fc-daygrid-body-natural .fc-daygrid-day-events {
+  margin-bottom: 0.35rem;
+}
+
+.optimus-calendar .fc-more-link {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--accent-muted);
+}
+
+.optimus-calendar .fc-v-event .fc-event-main {
+  padding: 2px 4px;
 }

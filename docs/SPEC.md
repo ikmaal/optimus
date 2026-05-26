@@ -3,17 +3,16 @@
 ## Scope
 
 - **Fleet**: Two company cars (configurable in DB). Both can be booked for the same time window by different people (different cars).
-- **Purpose**: Work-related trips. Optional free-text **reason** on each booking for team visibility.
+- **Purpose**: Work-related trips. **Reason** is stored on each booking for team visibility on the calendar and in Slack.
 
 ## Who can book
 
-- Any user who can sign in with a **company email** (domain allowlist via `ALLOWED_EMAIL_DOMAIN` env, e.g. `@company.com`).  
-- Admins are not required for v1; bookings are **self-serve** (no approval workflow).
+- **Open access**: No accounts or sign-in. Anyone with the link can view the calendar and create bookings using **name**, **vehicle**, and **reason**.
 
 ## Booking window
 
-- **Start** and **end** are **UTC** in the API; the UI shows times in the user’s **local** timezone.  
-- **Overnight** and **weekend** bookings are allowed unless you change env `ALLOW_WEEKENDS=false` (optional future tightening).
+- **Start** and **end** are stored in the DB; the UI shows times in the visitor’s **local** timezone.  
+- **Overnight** and **weekend** bookings are allowed unless you tighten this in a future version.
 
 ## Overlap policy
 
@@ -23,14 +22,13 @@
 
 ## Changes and cancellation
 
-- Users may **cancel** their own bookings (soft delete: `cancelledAt` set).  
-- **Editing** is implemented as cancel + create new to keep an audit-friendly history (optional: add explicit `updatedAt` later).
+- **Cancellation** is a soft delete (`cancelledAt` set). The API requires the **booker’s name** to match the booking (case-insensitive), as a light check in an open tool.  
+- **Editing** is cancel + create new.
 
-## Auth / Slack identity
+## Slack digest
 
-- Session binds **app user** to `email` + `name`.  
-- For Slack digests, set optional `slackUserId` on the user record when you map accounts (manual or future OAuth). Message text falls back to display name if Slack ID is missing.
+- Digest lines use **booker name** and **reason** from each booking. There is no Slack user mention mapping in v1.
 
 ## Notifications
 
-- **Daily digest**: Posted to a Slack channel on a schedule (weekdays by default in your cron config). See `README.md` for wiring `CRON_SECRET` and Slack tokens.
+- **Daily digest**: Posted to a Slack channel on a schedule. See `README.md` for `CRON_SECRET` and Slack tokens.

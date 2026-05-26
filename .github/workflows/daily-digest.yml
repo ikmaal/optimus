@@ -1,0 +1,19 @@
+# Post today's car schedule to Slack (weekdays 07:00 UTC — adjust cron to your timezone).
+name: Daily car digest
+
+on:
+  schedule:
+    - cron: "0 7 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger digest
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          BASE: ${{ secrets.APP_BASE_URL }}
+        run: |
+          test -n "$CRON_SECRET" && test -n "$BASE"
+          curl -sS -f -H "Authorization: Bearer ${CRON_SECRET}" "${BASE}/api/cron/daily-digest"

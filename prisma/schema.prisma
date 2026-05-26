@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Car {
+  id              String    @id @default(cuid())
+  label           String
+  plate           String?
+  active          Boolean   @default(true)
+  /** Current petrol in the tank (litres). */
+  fuelLitres      Float     @default(45)
+  /** Tank capacity (litres). */
+  fuelTankLitres  Float     @default(60)
+  bookings        Booking[]
+}
+
+model Booking {
+  id          String    @id @default(cuid())
+  carId       String
+  car         Car       @relation(fields: [carId], references: [id], onDelete: Cascade)
+  bookerName  String
+  startAt     DateTime
+  endAt       DateTime
+  reason      String?
+  cancelledAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([carId])
+  @@index([startAt, endAt])
+}
