@@ -19,7 +19,7 @@
     "digest:trigger": "node ./scripts/trigger-digest.mjs"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "node prisma/seed.mjs"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.20",

@@ -25,6 +25,9 @@ async function main() {
         },
       ],
     });
+    console.log("[seed] Created Red Car and Black Car.");
+  } else {
+    console.log(`[seed] Skipped — ${n} car(s) already in database.`);
   }
 }
 
