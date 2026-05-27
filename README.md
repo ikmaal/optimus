@@ -108,6 +108,8 @@ Host the app on any Node host; [`render.yaml`](render.yaml) targets **Render fre
 
 If you created services manually before, delete the old SQLite disk config and link the web service to the Render Postgres **Internal Database URL** (or redeploy from Blueprint).
 
+**Troubleshooting `DATABASE_URL must start with postgresql://`:** your web service still has an old SQLite `file:…` URL. In **optimus → Environment**, delete manual `DATABASE_URL`, then **Add → Link database → optimus-db → Connection string** (name it `DATABASE_URL`), save, and redeploy.
+
 **Note:** Free web services sleep when idle; free Postgres expires after 90 days of inactivity (Render policy — check current docs).
 
 ## Scripts
