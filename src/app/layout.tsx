@@ -15,6 +15,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Company car booking",
   description: "Book shared company cars and see the team calendar.",
+  icons: {
+    icon: [{ url: "/optimus_logo.png", type: "image/png" }],
+    apple: [{ url: "/optimus_logo.png", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({
