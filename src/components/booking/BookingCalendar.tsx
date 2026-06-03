@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -8,6 +9,11 @@ import interactionPlugin from "@fullcalendar/interaction";
 import type { EventClickArg, DateSelectArg, EventInput } from "@fullcalendar/core";
 import { format } from "date-fns";
 import type { FleetCar } from "@/lib/fleet/queries";
+
+const CollectCarPanel = dynamic(
+  () => import("@/components/map/CollectCarPanel").then((m) => ({ default: m.CollectCarPanel })),
+  { loading: () => <p className="text-sm" style={{ color: "var(--text-muted)" }}>Loading map…</p> },
+);
 
 type BookingRow = {
   id: string;
@@ -80,6 +86,7 @@ export function BookingCalendar({ cars, refreshKey, onBookingChanged }: Props) {
             bookerName: b.bookerName,
             reason: b.reason,
             carLabel: b.car.label,
+            carId: b.carId,
           },
         };
       });
@@ -176,6 +183,14 @@ export function BookingCalendar({ cars, refreshKey, onBookingChanged }: Props) {
   const plugins = useMemo(() => [dayGridPlugin, timeGridPlugin, interactionPlugin], []);
 
   const confirmDisabled = submitting || !carIdForForm || !formName.trim() || !reason.trim();
+
+  const detailCar = useMemo(() => {
+    if (!detail) return null;
+    const carId = detail.event.extendedProps.carId as string | undefined;
+    if (carId) return cars.find((c) => c.id === carId) ?? null;
+    const label = String(detail.event.extendedProps.carLabel ?? "");
+    return cars.find((c) => c.label === label) ?? null;
+  }, [detail, cars]);
 
   const inputClassName =
     "mt-2 w-full rounded-[var(--radius-sm)] border px-3.5 py-2.5 text-sm outline-none transition-[box-shadow] focus:ring-2 focus:ring-[color:var(--ring-focus)]";
@@ -330,7 +345,7 @@ export function BookingCalendar({ cars, refreshKey, onBookingChanged }: Props) {
       {detail ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-4 backdrop-blur-[2px]">
           <div
-            className="w-full max-w-md rounded-2xl p-7 shadow-[var(--shadow-card)] ring-1 ring-black/5 dark:ring-white/10"
+            className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-2xl p-7 shadow-[var(--shadow-card)] ring-1 ring-black/5 dark:ring-white/10"
             style={{ background: "var(--surface-elevated)" }}
             role="dialog"
             aria-modal
@@ -363,6 +378,11 @@ export function BookingCalendar({ cars, refreshKey, onBookingChanged }: Props) {
                 >
                   {String(detail.event.extendedProps.reason)}
                 </p>
+              </div>
+            ) : null}
+            {detailCar ? (
+              <div className="mt-6 border-t pt-6" style={{ borderColor: "var(--border-subtle)" }}>
+                <CollectCarPanel carLabel={detailCar.label} parkedLot={detailCar.parkedLot} />
               </div>
             ) : null}
             <div className="mt-8 flex justify-end gap-3">

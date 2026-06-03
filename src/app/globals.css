@@ -203,3 +203,15 @@ body {
 .optimus-calendar .fc-v-event .fc-event-main {
   padding: 2px 4px;
 }
+
+/* Animated walking route on basement map */
+@keyframes optimus-route-dash {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+.optimus-route-line {
+  stroke-dasharray: 10 6;
+  animation: optimus-route-dash 1.2s linear infinite;
+}

@@ -15,6 +15,11 @@ const FleetInfoSection = dynamic(
   { loading: () => <ViewLoading label="Loading vehicle info…" /> },
 );
 
+const CarparkMapSection = dynamic(
+  () => import("@/components/map/CarparkMapSection").then((m) => ({ default: m.CarparkMapSection })),
+  { loading: () => <ViewLoading label="Loading carpark map…" /> },
+);
+
 const BookingCalendar = dynamic(
   () => import("@/components/booking/BookingCalendar").then((m) => ({ default: m.BookingCalendar })),
   { loading: () => <ViewLoading label="Loading calendar…" /> },
@@ -29,6 +34,7 @@ export function Dashboard({ cars, upcomingBookings: initialBookings }: Props) {
   const [view, setView] = useState<DashboardView>("calendar");
   const [refreshKey, setRefreshKey] = useState(0);
   const [bookings, setBookings] = useState(initialBookings);
+  const [fleetCars, setFleetCars] = useState(cars);
 
   const refreshSchedule = useCallback(async () => {
     const { start, end } = scheduleRangeIso(SCHEDULE_LOOKAHEAD_DAYS);
@@ -61,13 +67,25 @@ export function Dashboard({ cars, upcomingBookings: initialBookings }: Props) {
         <DashboardHeader view={view} onViewChange={setView} />
 
         {view === "info" ? (
-          <FleetInfoSection cars={cars} bookings={bookings} />
+          <FleetInfoSection
+            cars={fleetCars}
+            bookings={bookings}
+            onCarParkUpdated={(carId, parkedLot) =>
+              setFleetCars((prev) =>
+                prev.map((c) =>
+                  c.id === carId ? { ...c, parkedLot, parkedLotUpdatedAt: new Date() } : c,
+                ),
+              )
+            }
+          />
+        ) : view === "map" ? (
+          <CarparkMapSection cars={fleetCars} />
         ) : (
           <>
             <p className="text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
               Click and drag on the grid to choose a time. Each block shows who booked and why.
             </p>
-            <BookingCalendar cars={cars} refreshKey={refreshKey} onBookingChanged={bumpCalendar} />
+            <BookingCalendar cars={fleetCars} refreshKey={refreshKey} onBookingChanged={bumpCalendar} />
           </>
         )}
       </div>

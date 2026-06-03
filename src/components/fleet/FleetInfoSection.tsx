@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 import { CarSchedulePanel } from "@/components/fleet/CarSchedulePanel";
 import { FuelPanel } from "@/components/fleet/FuelPanel";
+import { ReportParkingForm } from "@/components/map/CollectCarPanel";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { StatRow } from "@/components/ui/StatRow";
 import { fleetSpecsForCar } from "@/lib/fleet/car-info";
@@ -32,9 +33,10 @@ const FleetCarViewer = dynamic(
 type Props = {
   cars: FleetCar[];
   bookings: FleetBookingPreview[];
+  onCarParkUpdated?: (carId: string, parkedLot: string) => void;
 };
 
-export function FleetInfoSection({ cars, bookings }: Props) {
+export function FleetInfoSection({ cars, bookings, onCarParkUpdated }: Props) {
   const [pickedId, setPickedId] = useState(cars[0]?.id ?? "");
 
   const selected = useMemo(() => cars.find((c) => c.id === pickedId) ?? cars[0], [cars, pickedId]);
@@ -88,6 +90,24 @@ export function FleetInfoSection({ cars, bookings }: Props) {
           ) : null}
 
           <FuelPanel litres={selected.fuelLitres} tankLitres={selected.fuelTankLitres} />
+
+          <div className="mt-6 border-t pt-6" style={{ borderColor: "var(--border-subtle)" }}>
+            <h3
+              className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em]"
+              style={{ color: "var(--text-muted)" }}
+            >
+              Basement parking
+            </h3>
+            <div className="mt-3">
+              <StatRow label="Parked at" value={selected.parkedLot ?? "Not reported"} />
+            </div>
+            <div className="mt-4">
+              <ReportParkingForm
+                car={selected}
+                onUpdated={(lot) => onCarParkUpdated?.(selected.id, lot)}
+              />
+            </div>
+          </div>
 
           <CarSchedulePanel carId={selected.id} bookings={bookings} />
 

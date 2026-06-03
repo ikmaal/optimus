@@ -4,6 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import { Bounds, Center, Environment, OrbitControls } from "@react-three/drei";
 import { Suspense } from "react";
 import type { FleetCarSpecs } from "@/lib/fleet/car-info";
+import { FleetGlbModel } from "@/components/fleet/FleetGlbModel";
 import { FleetSedanModel } from "@/components/fleet/FleetSedanModel";
 
 type Props = {
@@ -11,7 +12,19 @@ type Props = {
 };
 
 const VIEWER_HEIGHT = "min(56vh, 480px)";
-const MODEL_SCALE = 1.35;
+const PROCEDURAL_SCALE = 1.35;
+
+function FleetCarModel({ specs }: { specs: FleetCarSpecs }) {
+  if (specs.modelUrl) {
+    return <FleetGlbModel url={specs.modelUrl} rotationY={specs.modelRotationY ?? 0} />;
+  }
+
+  return (
+    <group scale={PROCEDURAL_SCALE}>
+      <FleetSedanModel paintHex={specs.paintHex} viewerVariant={specs.viewerVariant} />
+    </group>
+  );
+}
 
 export function FleetCarViewer({ specs }: Props) {
   return (
@@ -52,9 +65,7 @@ export function FleetCarViewer({ specs }: Props) {
 
           <Bounds fit clip observe margin={1.18}>
             <Center top>
-              <group scale={MODEL_SCALE}>
-                <FleetSedanModel paintHex={specs.paintHex} viewerVariant={specs.viewerVariant} />
-              </group>
+              <FleetCarModel specs={specs} />
             </Center>
           </Bounds>
 

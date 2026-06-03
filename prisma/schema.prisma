@@ -8,15 +8,18 @@ datasource db {
 }
 
 model Car {
-  id              String    @id @default(cuid())
-  label           String
-  plate           String?
-  active          Boolean   @default(true)
+  id                  String    @id @default(cuid())
+  label               String
+  plate               String?
+  active              Boolean   @default(true)
   /** Current petrol in the tank (litres). */
-  fuelLitres      Float     @default(45)
+  fuelLitres          Float     @default(45)
   /** Tank capacity (litres). */
-  fuelTankLitres  Float     @default(60)
-  bookings        Booking[]
+  fuelTankLitres      Float     @default(60)
+  /** Last reported basement lot, e.g. "Car Lot 42". */
+  parkedLot           String?
+  parkedLotUpdatedAt  DateTime?
+  bookings            Booking[]
 }
 
 model Booking {

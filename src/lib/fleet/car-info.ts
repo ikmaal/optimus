@@ -4,6 +4,10 @@ import type { FleetCar } from "@/lib/fleet/queries";
 export type FleetCarSpecs = {
   paintHex: string;
   viewerVariant: "red" | "black" | "default";
+  /** When set, Info tab 3D viewer loads this GLB instead of the procedural sedan. */
+  modelUrl?: string;
+  /** Y-axis rotation for GLB exports (radians). */
+  modelRotationY?: number;
   bodyStyle: string;
   seats: number;
   drivetrain: string;
@@ -32,7 +36,10 @@ export function fleetSpecsForCar(car: FleetCar): FleetCarSpecs {
         ...DEFAULT,
         paintHex: "#b71c1c",
         viewerVariant: "red",
-        bodyStyle: "Executive sedan",
+        modelUrl: "/models/red-car.glb",
+        modelRotationY: Math.PI / 2,
+        bodyStyle: "Kia SUV",
+        drivetrain: "AWD",
         estimatedRangeKm: 640,
         powerKw: 155,
         torqueNm: 335,
@@ -43,7 +50,9 @@ export function fleetSpecsForCar(car: FleetCar): FleetCarSpecs {
         ...DEFAULT,
         paintHex: "#1a1a1a",
         viewerVariant: "black",
-        bodyStyle: "Executive sedan — metallic",
+        modelUrl: "/models/black-car.glb",
+        modelRotationY: Math.PI / 2,
+        bodyStyle: "Ride-share sedan",
         drivetrain: "AWD",
         estimatedRangeKm: 600,
         powerKw: 180,

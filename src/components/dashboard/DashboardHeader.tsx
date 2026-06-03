@@ -1,10 +1,11 @@
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 
-export type DashboardView = "info" | "calendar";
+export type DashboardView = "info" | "calendar" | "map";
 
 const VIEW_OPTIONS = [
   { id: "info" as const, label: "Info" },
   { id: "calendar" as const, label: "Calendar" },
+  { id: "map" as const, label: "Map" },
 ];
 
 type Props = {
