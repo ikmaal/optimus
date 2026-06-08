@@ -7,6 +7,7 @@ import { FuelPanel } from "@/components/fleet/FuelPanel";
 import { ReportParkingForm } from "@/components/map/CollectCarPanel";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { StatRow } from "@/components/ui/StatRow";
+import { carOperationalStatus, statusDetail, statusLabel } from "@/lib/fleet/car-status";
 import { fleetSpecsForCar } from "@/lib/fleet/car-info";
 import type { FleetCar } from "@/lib/fleet/queries";
 import type { FleetBookingPreview } from "@/lib/fleet/schedule";
@@ -41,6 +42,14 @@ export function FleetInfoSection({ cars, bookings, onCarParkUpdated }: Props) {
 
   const selected = useMemo(() => cars.find((c) => c.id === pickedId) ?? cars[0], [cars, pickedId]);
   const specs = useMemo(() => (selected ? fleetSpecsForCar(selected) : null), [selected]);
+  const operationalStatus = useMemo(
+    () => (selected ? carOperationalStatus(selected, bookings) : "parked"),
+    [selected, bookings],
+  );
+  const operationalDetail = useMemo(
+    () => (selected ? statusDetail(selected, operationalStatus, bookings) : ""),
+    [selected, operationalStatus, bookings],
+  );
 
   if (!selected || !specs) {
     return (
@@ -65,7 +74,11 @@ export function FleetInfoSection({ cars, bookings, onCarParkUpdated }: Props) {
       ) : null}
 
       <div className="grid gap-8 lg:grid-cols-[1.15fr_minmax(0,0.85fr)] lg:items-start">
-        <FleetCarViewer specs={specs} />
+        <FleetCarViewer
+          specs={specs}
+          status={operationalStatus}
+          statusDetail={operationalDetail}
+        />
 
         <aside
           className="rounded-[var(--radius-lg)] border px-6 py-6 shadow-[var(--shadow-card)]"
@@ -89,7 +102,25 @@ export function FleetInfoSection({ cars, bookings, onCarParkUpdated }: Props) {
             </p>
           ) : null}
 
+          <div className="mt-3">
+            <StatRow label="Status" value={statusLabel(operationalStatus)} />
+            <p className="mt-1 text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
+              {operationalDetail}
+            </p>
+          </div>
+
           <FuelPanel litres={selected.fuelLitres} tankLitres={selected.fuelTankLitres} />
+
+          <div className="mt-4">
+            <StatRow
+              label="Odometer"
+              value={
+                selected.odometerKm !== null && selected.odometerKm !== undefined
+                  ? `${selected.odometerKm.toLocaleString()} km`
+                  : "Not recorded"
+              }
+            />
+          </div>
 
           <div className="mt-6 border-t pt-6" style={{ borderColor: "var(--border-subtle)" }}>
             <h3

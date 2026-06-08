@@ -1,30 +1,37 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CarparkMap } from "@/components/map/CarparkMap";
-import { CollectCarPanel, ReportParkingForm } from "@/components/map/CollectCarPanel";
+import { CarparkMap, type CarMarker } from "@/components/map/CarparkMap";
+import { CheckInFlow } from "@/components/map/CheckInFlow";
+import { ReportParkingForm } from "@/components/map/CollectCarPanel";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import type { FleetCar } from "@/lib/fleet/queries";
 
 type Props = {
   cars: FleetCar[];
+  /** Bubble inspection updates (fuel/odometer) up to the dashboard. */
+  onCarUpdated?: (car: FleetCar) => void;
 };
 
-type MapMode = "collect" | "report" | "overview";
+type MapMode = "checkin" | "report" | "overview";
 
 const MODE_OPTIONS = [
-  { id: "collect" as const, label: "Collect car" },
+  { id: "checkin" as const, label: "Check in" },
   { id: "report" as const, label: "Report parking" },
   { id: "overview" as const, label: "Overview" },
 ];
 
-export function CarparkMapSection({ cars: initialCars }: Props) {
+export function CarparkMapSection({ cars: initialCars, onCarUpdated }: Props) {
   const [cars, setCars] = useState(initialCars);
-  const [mode, setMode] = useState<MapMode>("collect");
+  const [mode, setMode] = useState<MapMode>("checkin");
   const [pickedId, setPickedId] = useState(initialCars[0]?.id ?? "");
 
   const selected = useMemo(() => cars.find((c) => c.id === pickedId) ?? cars[0], [cars, pickedId]);
   const carOptions = cars.map((c) => ({ id: c.id, label: c.label }));
+  const allMarkers: CarMarker[] = useMemo(
+    () => cars.map((c) => ({ carId: c.id, label: c.label, lot: c.parkedLot ?? null })),
+    [cars],
+  );
 
   const handleParkUpdated = (carId: string, parkedLot: string) => {
     setCars((prev) =>
@@ -32,6 +39,11 @@ export function CarparkMapSection({ cars: initialCars }: Props) {
         c.id === carId ? { ...c, parkedLot, parkedLotUpdatedAt: new Date() } : c,
       ),
     );
+  };
+
+  const handleCarUpdated = (updated: FleetCar) => {
+    setCars((prev) => prev.map((c) => (c.id === updated.id ? { ...c, ...updated } : c)));
+    onCarUpdated?.(updated);
   };
 
   if (!selected) {
@@ -59,8 +71,8 @@ export function CarparkMapSection({ cars: initialCars }: Props) {
 
       <SegmentedControl options={MODE_OPTIONS} value={mode} onChange={setMode} ariaLabel="Map mode" />
 
-      {mode === "collect" ? (
-        <CollectCarPanel carLabel={selected.label} parkedLot={selected.parkedLot} />
+      {mode === "checkin" ? (
+        <CheckInFlow car={selected} cars={cars} onCarUpdated={handleCarUpdated} />
       ) : null}
 
       {mode === "report" ? (
@@ -85,9 +97,11 @@ export function CarparkMapSection({ cars: initialCars }: Props) {
 
       {mode === "overview" ? (
         <CarparkMap
-          highlightLot={selected.parkedLot}
+          targetLot={selected.parkedLot}
           showRoute={Boolean(selected.parkedLot)}
-          carLabel={selected.label}
+          carMarkers={allMarkers}
+          interactive
+          heightClass="h-[min(64vh,520px)]"
         />
       ) : null}
     </div>

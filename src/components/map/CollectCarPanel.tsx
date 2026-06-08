@@ -49,6 +49,18 @@ export function ReportParkingForm({ car, onUpdated }: Props) {
           Where did you park {car.label}?
         </label>
         <ParkLotSelect id={`park-${car.id}`} value={lot} onChange={setLot} disabled={submitting} />
+        <p className="mt-2 text-xs" style={{ color: "var(--text-muted)" }}>
+          Or tap the lot on the map below.
+        </p>
+        <div className="mt-2">
+          <CarparkMap
+            interactive
+            selectedLot={lot || null}
+            onSelectLot={setLot}
+            carMarkers={[{ label: car.label, lot: lot || car.parkedLot }]}
+            heightClass="h-[min(48vh,380px)]"
+          />
+        </div>
       </div>
       {error ? (
         <p className="text-sm text-red-600 dark:text-rose-400" role="alert">
@@ -115,7 +127,12 @@ export function CollectCarPanel({ carLabel, parkedLot }: CollectProps) {
           Enter the basement from the passenger lobby and follow the route below.
         </p>
       </div>
-      <CarparkMap highlightLot={parkedLot} showRoute carLabel={carLabel} />
+      <CarparkMap
+        targetLot={parkedLot}
+        showRoute
+        carMarkers={[{ label: carLabel, lot: parkedLot }]}
+        heightClass="h-[min(52vh,420px)]"
+      />
     </div>
   );
 }

@@ -58,6 +58,24 @@ If creating a booking fails, run **`npx prisma migrate deploy`**, then **`npx pr
 | `SLACK_BOT_TOKEN` | Optional — only if you use the bot instead of a webhook |
 | `SLACK_CHANNEL_ID` | Required with bot token (e.g. `C...`) |
 | `CRON_SECRET` | Long random string; must be sent as `Authorization: Bearer ...` to the cron route |
+| `OPENAI_API_KEY` | Enables AI check-in scanning (GPT-4o vision reads odometer + fuel) |
+| `SUPABASE_URL` | Supabase project URL for inspection photo storage |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-only secret) |
+| `SUPABASE_INSPECTION_BUCKET` | Optional — private photo bucket name (default `car-inspections`) |
+
+## AI check-in capture
+
+During check-in the driver photographs the odometer and fuel gauge; GPT-4o reads
+both values, the driver reviews/edits them, and the car's fuel + odometer update
+live. Photos are stored in a private Supabase bucket.
+
+To enable it, set `OPENAI_API_KEY`, `SUPABASE_URL`, and
+`SUPABASE_SERVICE_ROLE_KEY`, then create the storage bucket in Supabase:
+**Storage → New bucket → name `car-inspections` → keep it private**. The app
+reads photos back via short-lived signed URLs.
+
+If these env vars are missing, scanning is disabled: in development the driver
+can skip the step, and in production the scan route returns `501`.
 
 ## Slack daily digest
 

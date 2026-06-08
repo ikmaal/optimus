@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { AmbientAudio } from "@/components/audio/AmbientAudio";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,6 +30,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[var(--surface-page)] font-sans text-[var(--text-primary)] antialiased">
         {children}
+        <AmbientAudio />
       </body>
     </html>
   );

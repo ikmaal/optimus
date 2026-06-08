@@ -15,6 +15,8 @@ export type FleetCarSpecs = {
   powerKw: number;
   torqueNm: number;
   zeroTo100Sec: number;
+  /** Hint for GPT-4o vision when reading this car's fuel gauge photo. */
+  fuelGaugeHint?: string;
 };
 
 const DEFAULT: FleetCarSpecs = {
@@ -44,6 +46,10 @@ export function fleetSpecsForCar(car: FleetCar): FleetCarSpecs {
         powerKw: 155,
         torqueNm: 335,
         zeroTo100Sec: 7.9,
+        fuelGaugeHint:
+          "One dashboard photo: odometer is XXXXXXkm on the centre LCD (bottom of digital display). " +
+          "Fuel is the analog 0→1 needle sub-gauge at the bottom of the RIGHT speedometer — " +
+          "ignore the large speedometer needle and the left temperature gauge.",
       };
     case "Black Car":
       return {
@@ -58,6 +64,10 @@ export function fleetSpecsForCar(car: FleetCar): FleetCarSpecs {
         powerKw: 180,
         torqueNm: 380,
         zeroTo100Sec: 6.9,
+        fuelGaugeHint:
+          "One dashboard photo: odometer is XXXXXXkm on the centre LCD (bottom of digital display). " +
+          "Fuel is the analog 0→1 needle sub-gauge at the bottom of the RIGHT speedometer — " +
+          "ignore the large speedometer needle and the left temperature gauge.",
       };
     default:
       return DEFAULT;

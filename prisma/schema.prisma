@@ -8,18 +8,45 @@ datasource db {
 }
 
 model Car {
-  id                  String    @id @default(cuid())
+  id                  String       @id @default(cuid())
   label               String
   plate               String?
-  active              Boolean   @default(true)
+  active              Boolean      @default(true)
   /** Current petrol in the tank (litres). */
-  fuelLitres          Float     @default(45)
+  fuelLitres          Float        @default(45)
   /** Tank capacity (litres). */
-  fuelTankLitres      Float     @default(60)
+  fuelTankLitres      Float        @default(60)
   /** Last reported basement lot, e.g. "Car Lot 42". */
   parkedLot           String?
   parkedLotUpdatedAt  DateTime?
+  /** Latest odometer reading in kilometres. */
+  odometerKm          Float?
   bookings            Booking[]
+  inspections         Inspection[]
+}
+
+model Inspection {
+  id            String   @id @default(cuid())
+  carId         String
+  car           Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+  /** Stand-in for the logged-in user until auth lands. */
+  driverName    String
+  kind          String   @default("checkin")
+  odometerKm    Float?
+  fuelLitres    Float?
+  /** AI-estimated tank fraction, 0..1. */
+  fuelFraction  Float?
+  aiConfidence  String?
+  aiRaw         Json?
+  photoPaths    String[]
+  /** Cashcard / ERP balance in dollars at check-in. */
+  cashcardBalance    Float?
+  /** Date and time shown on the cashcard screen when photographed. */
+  cashcardCapturedAt DateTime?
+  createdAt     DateTime @default(now())
+
+  @@index([carId])
+  @@index([createdAt])
 }
 
 model Booking {

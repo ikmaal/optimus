@@ -25,16 +25,14 @@ export function DashboardHeader({ view, onViewChange }: Props) {
             >
               Fleet schedule
             </p>
-            <h1
-              className="mt-1.5 text-[1.65rem] font-semibold leading-tight tracking-tight sm:text-3xl"
-              style={{ color: "var(--text-primary)" }}
-            >
-              Company vehicles
+            <h1 className="mt-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/optimus_logo.png"
+                alt="Optimus"
+                className="mx-auto h-9 w-auto sm:h-11"
+              />
             </h1>
-            <p className="pt-2 text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-              Anyone can view and book. Add your name, vehicle, and reason when you reserve. To cancel, open the
-              booking and use your name to confirm.
-            </p>
           </div>
 
           <SegmentedControl

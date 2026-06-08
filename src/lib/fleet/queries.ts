@@ -9,6 +9,7 @@ export const fleetCarSelect = {
   fuelTankLitres: true,
   parkedLot: true,
   parkedLotUpdatedAt: true,
+  odometerKm: true,
 } satisfies Prisma.CarSelect;
 
 export type FleetCar = Prisma.CarGetPayload<{ select: typeof fleetCarSelect }>;

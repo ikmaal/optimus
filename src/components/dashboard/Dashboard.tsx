@@ -79,7 +79,14 @@ export function Dashboard({ cars, upcomingBookings: initialBookings }: Props) {
             }
           />
         ) : view === "map" ? (
-          <CarparkMapSection cars={fleetCars} />
+          <CarparkMapSection
+            cars={fleetCars}
+            onCarUpdated={(updated) =>
+              setFleetCars((prev) =>
+                prev.map((c) => (c.id === updated.id ? { ...c, ...updated } : c)),
+              )
+            }
+          />
         ) : (
           <>
             <p className="text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
